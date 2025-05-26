@@ -8,7 +8,8 @@ import queue
 import sqlite3
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from processing_system.interpreter import run_code  # ← 適宜変更してください
+from processing_system.interpreter import run_code
+import argparse
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
@@ -177,4 +178,12 @@ def handle_exception(e):
 
 if __name__ == "__main__":
     init_db()
-    app.run(debug=True)
+    parser = argparse.ArgumentParser(description="IMP Web System Flask App")
+    parser.add_argument("--host", default="127.0.0.1", help="Host to run the Flask app on")
+    parser.add_argument("--port", type=int, default=5000, help="Port to run the Flask app on")
+    parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+    args = parser.parse_args()
+
+    app.run(host=args.host,port=args.port,debug=args.debug)
+
+
