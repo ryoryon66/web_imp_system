@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>サンプルコード一覧</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <style>
+    pre {
+      background: #f8f9fa;
+      border-left: 4px solid #ced4da;
+      padding: 1rem;
+      white-space: pre-wrap;
+      user-select: all;
+    }
+    .copy-btn {
+      margin-bottom: 0.75rem;
+    }
+    .top-link {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+    }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container my-5">
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary top-link">← インデックスページに戻る</a>
+
+    <h1 class="mb-4">サンプルコード一覧（クリックでコピー）</h1>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="section-title">add_func.txt</div>
+        <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyText('code-add', this)">コピー</button>
+        <pre id="code-add" class="text-monospace">def add(x,y,){
+    sum := x+y
+    return sum
+};
+
+res := add(1,2,)</pre>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="section-title">high_order_func.txt</div>
+        <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyText('code-hof', this)">コピー</button>
+        <pre id="code-hof" class="text-monospace">def sum (f,x,){
+    ans := 0;
+    if 0 < x then
+        ans := f(x,) + sum(f,x-1,)
+    else
+        ans := 0
+    end
+
+    return ans
+};
+
+def sq(x,){
+    skip
+    return x*x
+};
+
+#def tri (x,){
+#    skip
+#    return x*x *x
+#};
+
+ans := sum(sq,2,);
+print ans;
+
+#print sum(tri, sum(sq,2,),);
+
+skip</pre>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="section-title">GCD.txt</div>
+        <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyText('code-gcd', this)">コピー</button>
+        <pre id="code-gcd" class="text-monospace">a := 10;
+b := 5;
+i := 0;
+
+while not (a = b) do
+    if a < b then
+        c := b;
+        b := a;
+        a := c
+    else
+        skip
+    end;
+
+    i := i + 1;
+    a := a - b
+end;
+
+print i;
+print a;
+
+skip</pre>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="section-title">if.txt</div>
+        <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyText('code-if', this)">コピー</button>
+        <pre id="code-if" class="text-monospace">a := 2;
+
+if a = 2 then
+ a := 20
+else 
+ a := 10
+end;
+
+print a;
+
+skip</pre>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="section-title">sum.txt</div>
+        <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyText('code-sum', this)">コピー</button>
+        <pre id="code-sum" class="text-monospace">X := 2;
+Z := 0;
+
+while not X = 0 do
+    Z := Z + X;
+    X := X - 1
+end;
+
+print Z</pre>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="section-title">emulate_list.txt</div>
+        <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyText('emulate_list', this)">コピー</button>
+        <pre id="emulate_list" class="text-monospace">
+# 自然数を用いたリストの実装 数理論理学B参考
+
+def pair (x, y,){
+    skip
+    return (x + y) * (x + y + 1) / 2 + y
+};
+
+def first (z,) {
+    # z = pair(x, y)のとき、xを返す　探索する
+
+    x := 0;
+    y := 0;
+    ret := -1;
+
+    def pair (x, y,){
+        skip
+        return (x + y) * (x + y + 1) / 2 + y
+    };
+
+    while not ret = z do
+        ret := pair(x, y,);
+        if ret = z then
+            skip
+        else
+            x := x - 1;
+            y := y + 1;
+
+            if x < 0 then
+                x := y;
+                y := 0
+            else
+                skip
+            end
+        end
+    end
+
+    return x
+};
+
+def second (z,) {
+    # z = pair(x, y)のとき、yを返す　探索する
+
+    x := 0;
+    y := 0;
+    ret := -1;
+
+    def pair (x, y,){
+        skip
+        return (x + y) * (x + y + 1) / 2 + y
+    };
+
+    while not ret = z do
+        ret := pair(x, y,);
+        if ret = z then
+            skip
+        else
+            x := x - 1;
+            y := y + 1;
+
+            if x < 0 then
+                x := y;
+                y := 0
+            else
+                skip
+            end
+        end
+    end
+
+    return y
+};
+
+
+nil := 0;
+
+def cons (x, l,){
+    def pair (x, y,){
+        skip
+        return (x + y) * (x + y + 1) / 2 + y
+    };
+    res := pair(x, l,) + 1
+    return res
+};
+
+def nth (n, l,) {
+    # l = cons(x, l)のとき、n番目の要素を返す
+
+    def pair (x, y,){
+        skip
+        return (x + y) * (x + y + 1) / 2 + y
+    };
+
+    def first (z,) {
+        # z = pair(x, y)のとき、xを返す　探索する
+
+        x := 0;
+        y := 0;
+        ret := -1;
+
+        def pair (x, y,){
+            skip
+            return (x + y) * (x + y + 1) / 2 + y
+        };
+
+        while not ret = z do
+            ret := pair(x, y,);
+            if ret = z then
+                skip
+            else
+                x := x - 1;
+                y := y + 1;
+
+                if x < 0 then
+                    x := y;
+                    y := 0
+                else
+                    skip
+                end
+            end
+        end
+
+        return x
+    };
+
+    def second (z,) {
+        # z = pair(x, y)のとき、yを返す　探索する
+
+        x := 0;
+        y := 0;
+        ret := -1;
+
+        def pair (x, y,){
+            skip
+            return (x + y) * (x + y + 1) / 2 + y
+        };
+
+        while not ret = z do
+            ret := pair(x, y,);
+            if ret = z then
+                skip
+            else
+                x := x - 1;
+                y := y + 1;
+
+                if x < 0 then
+                    x := y;
+                    y := 0
+                else
+                    skip
+                end
+            end
+        end
+
+        return y
+    };
+
+    if n = 0 then
+        res := first(l - 1,pair,)
+    else
+        res := nth(n - 1, second(l - 1,pair,),pair,) 
+    end
+
+    return res
+};
+
+def length (l,) {
+    # l = cons(x, l)のとき、長さを返す
+
+    def pair (x, y,){
+        skip
+        return (x + y) * (x + y + 1) / 2 + y
+    };
+
+    def first (z,) {
+        # z = pair(x, y)のとき、xを返す　探索する
+
+        x := 0;
+        y := 0;
+        ret := -1;
+
+        def pair (x, y,){
+            skip
+            return (x + y) * (x + y + 1) / 2 + y
+        };
+
+        while not ret = z do
+            ret := pair(x, y,);
+            if ret = z then
+                skip
+            else
+                x := x - 1;
+                y := y + 1;
+
+                if x < 0 then
+                    x := y;
+                    y := 0
+                else
+                    skip
+                end
+            end
+        end
+
+        return x
+    };
+
+    def second (z,) {
+        # z = pair(x, y)のとき、yを返す　探索する
+
+        x := 0;
+        y := 0;
+        ret := -1;
+
+        def pair (x, y,){
+            skip
+            return (x + y) * (x + y + 1) / 2 + y
+        };
+
+        while not ret = z do
+            ret := pair(x, y,);
+            if ret = z then
+                skip
+            else
+                x := x - 1;
+                y := y + 1;
+
+                if x < 0 then
+                    x := y;
+                    y := 0
+                else
+                    skip
+                end
+            end
+        end
+
+        return y
+    };
+
+    res := 0;
+    while not l = nil do
+        res := res + 1;
+        l := second(l - 1,pair,) 
+    end
+
+    return res
+};
+
+
+# [2,1,]を作る
+
+l :=  cons (2, cons (1, nil, ), );
+
+print  l;
+
+print nth(0, l,);
+print nth(1, l,);
+print length(l,);
+
+skip
+</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function copyText(id, button) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const original = button.textContent;
+        button.textContent = "コピーしました！";
+        button.classList.remove("btn-outline-primary");
+        button.classList.add("btn-success");
+        setTimeout(() => {
+          button.textContent = original;
+          button.classList.remove("btn-success");
+          button.classList.add("btn-outline-primary");
+        }, 1500);
+      }).catch(err => {
+        alert("コピーに失敗しました: " + err);
+      });
+    }
+  </script>
+</body>
+</html>

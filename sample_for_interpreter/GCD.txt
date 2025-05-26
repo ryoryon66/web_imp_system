@@ -1,0 +1,21 @@
+a := 10;
+b := 5;
+i := 0;
+
+while not (a = b) do
+    if a < b then
+        c := b;
+        b := a;
+        a := c
+    else
+        skip
+    end;
+    
+    i := i + 1;
+    a := a - b
+end;
+
+print i;
+print a;
+
+skip

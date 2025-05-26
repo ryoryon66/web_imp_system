@@ -1,0 +1,30 @@
+digraph G {
+node [shape=record];
+16872337625792706 [label="{\<a:=2;if a=2 then a:=20 else a:=10 end;print a;skip,[]\>→[(a, 20)]}" color="black" penwidth="3.0" style="filled" fillcolor="gray"];
+16872337625793316 [label="{\<a:=2,[]\>→[(a, 2)]}" color="green" penwidth="3.0" style="filled" fillcolor="gray"];
+1687233762579352 [label="{\<2,[]\>→2}" color="purple" penwidth="3.0" style="filled" fillcolor="gray"];
+1687233762579352 -> 16872337625793316;
+16872337625793316 -> 16872337625792706;
+16872337625793948 [label="{\<if a=2 then a:=20 else a:=10 end;print a;skip,[(a, 2)]\>→[(a, 20)]}" color="black" penwidth="3.0" style="filled" fillcolor="gray"];
+168723376257941 [label="{\<if a=2 then a:=20 else a:=10 end,[(a, 2)]\>→[(a, 20)]}" color="blue" penwidth="3.0" style="filled" fillcolor="gray"];
+1687233762579427 [label="{\<a=2,[(a, 2)]\>→True}" color="brown" penwidth="3.0" style="filled" fillcolor="gray"];
+16872337625794528 [label="{\<a,[(a, 2)]\>→2}" color="purple" penwidth="3.0" style="filled" fillcolor="gray"];
+16872337625794528 -> 1687233762579427;
+16872337625794654 [label="{\<2,[(a, 2)]\>→2}" color="purple" penwidth="3.0" style="filled" fillcolor="gray"];
+16872337625794654 -> 1687233762579427;
+1687233762579427 -> 168723376257941;
+16872337625794897 [label="{\<a:=20,[(a, 2)]\>→[(a, 20)]}" color="green" penwidth="3.0" style="filled" fillcolor="gray"];
+16872337625795054 [label="{\<20,[(a, 2)]\>→20}" color="purple" penwidth="3.0" style="filled" fillcolor="gray"];
+16872337625795054 -> 16872337625794897;
+16872337625794897 -> 168723376257941;
+168723376257941 -> 16872337625793948;
+16872337625795357 [label="{\<print a;skip,[(a, 20)]\>→[(a, 20)]}" color="black" penwidth="3.0" style="filled" fillcolor="gray"];
+1687233762579552 [label="{\<print a,[(a, 20)]\>→[(a, 20)]}" color="orange" penwidth="3.0" style="filled" fillcolor="gray"];
+16872337625795689 [label="{\<a,[(a, 20)]\>→20}" color="purple" penwidth="3.0" style="filled" fillcolor="gray"];
+16872337625795689 -> 1687233762579552;
+1687233762579552 -> 16872337625795357;
+16872337625796566 [label="{\<skip,[(a, 20)]\>→[(a, 20)]}" color="orange" penwidth="3.0" style="filled" fillcolor="gray"];
+16872337625796566 -> 16872337625795357;
+16872337625795357 -> 16872337625793948;
+16872337625793948 -> 16872337625792706;
+}

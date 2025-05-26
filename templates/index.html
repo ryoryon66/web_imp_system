@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>IMP Operational Semantics Visualizer</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Viz.js -->
+  <script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/viz.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/full.render.js"></script>
+
+  <!-- CodeMirror -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css">
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.js"></script>
+
+  <style>
+    .CodeMirror {
+      font-family: monospace;
+      height: auto;
+    }
+    #codeDisplay span {
+      display: block;
+    }
+    #stdoutDisplay {
+      background: #eef9ee;
+      border-color: #7cc67c;
+    }
+    #graph {
+      text-align: center;
+    }
+    .accordion-button:not(.collapsed) {
+      background-color: #f8f9fa;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="container my-5">
+    <a href="{{ url_for('sample_codes') }}" class="btn btn-outline-secondary mb-3">← サンプルコード一覧へ</a>
+    <a href="{{ url_for('history') }}" class="btn btn-outline-secondary mb-3">実行履歴一覧へ →</a>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-secondary mb-3">ログアウト</a>
+
+    <h2 class="mb-4">IMP インタプリタ 導出木可視化デモ</h2>
+
+    <div class="mb-3">
+      <button class="btn btn-primary" onclick="runInterpreter()">実行</button>
+    </div>
+
+    <div id="editor" class="border mb-4"></div>
+
+    <div id="errorMessage" class="text-danger fw-bold mb-3"></div>
+
+    <div class="accordion" id="resultAccordion">
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingCode">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCode" aria-expanded="true">
+            📄 入力プログラム（背景赤はボトルネック行）
+          </button>
+        </h2>
+        <div id="collapseCode" class="accordion-collapse collapse show" data-bs-parent="#resultAccordion">
+          <div class="accordion-body">
+            <pre id="codeDisplay" class="border p-2"></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOutput">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOutput">
+            📤 出力結果および profile 結果
+          </button>
+        </h2>
+        <div id="collapseOutput" class="accordion-collapse collapse" data-bs-parent="#resultAccordion">
+          <div class="accordion-body">
+            <pre id="stdoutDisplay" class="border p-2"></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingGraph">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGraph">
+            🌲 導出木（Derivation Tree）
+          </button>
+        </h2>
+        <div id="collapseGraph" class="accordion-collapse collapse" data-bs-parent="#resultAccordion">
+          <div class="accordion-body">
+            <div id="graph" class="border p-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let editor;
+    const defaultCode = `# write your IMP code here!!!
+# This code represents the repeated squaring algorithm.
+
+def pow(x,n,){
+  res := 1;
+  if n < 2 then
+    if n = 0 then 
+      skip
+    else
+      res := x
+    end
+  else
+    tmp := pow(x, n/2,);  
+    res := tmp * tmp;
+    amari := n - n / 2 * 2;
+    if (amari = 1) then
+      res := res * x
+    else 
+      skip
+    end
+  end
+  return res
+};
+
+ans := pow(2,5,);
+print ans`;
+
+    window.onload = () => {
+      editor = CodeMirror(document.getElementById("editor"), {
+        value: defaultCode,
+        mode: null,
+        lineNumbers: true,
+        viewportMargin: Infinity
+      });
+    };
+
+    function extractHotLines(stdout) {
+      const freqLines = stdout.split("\n").filter(line => line.startsWith("line "));
+      let maxFreq = 0;
+      const freqMap = [];
+      freqLines.forEach(line => {
+        const m = line.match(/line\s+(\d+)\s*:\s*(\d+)/);
+        if (m) {
+          const ln = +m[1], freq = +m[2];
+          freqMap.push({ lineNum: ln, freq });
+          if (freq > maxFreq) maxFreq = freq;
+        }
+      });
+      return freqMap.filter(e => e.freq === maxFreq).map(e => e.lineNum);
+    }
+
+    function formatWithLineNumbersAndHighlight(code, hotLines) {
+      const lines = code.split("\n");
+      const w = String(lines.length).length;
+      return lines.map((ln, i) => {
+        const num = String(i + 1).padStart(w, " ");
+        const text = `line ${num}: ${ln}`;
+        if (hotLines.includes(i + 1)) {
+          return `<span style="background-color:#ffe0e0;">${text}</span>`;
+        }
+        return `<span>${text}</span>`;
+      }).join("");
+    }
+
+    async function runInterpreter() {
+      const code = editor.getValue();
+      const errDiv = document.getElementById("errorMessage");
+      errDiv.innerText = "";
+
+      document.getElementById("codeDisplay").innerHTML =
+        formatWithLineNumbersAndHighlight(code, []);
+      document.getElementById("stdoutDisplay").innerText = "";
+      document.getElementById("graph").innerHTML = "";
+
+      let raw, data;
+      try {
+        const res = await fetch("/run_interpreter", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code })
+        });
+
+        raw = await res.text();
+        try { data = JSON.parse(raw); } catch { data = null; }
+
+        if (!res.ok) {
+          const msg = (data && data.error) || raw || res.statusText;
+          throw new Error(msg.trim());
+        }
+      } catch (e) {
+        errDiv.innerText = e.message;
+        return;
+      }
+
+      if (data.error) {
+        errDiv.innerText = data.error;
+        return;
+      }
+
+      const hotLines = extractHotLines(data.stdout);
+      document.getElementById("codeDisplay").innerHTML =
+        formatWithLineNumbersAndHighlight(code, hotLines);
+      document.getElementById("stdoutDisplay").innerText = data.stdout;
+
+      setTimeout(async () => {
+        try {
+          const viz = new Viz();
+          const svgEl = await viz.renderSVGElement(data.dot);
+          const g = document.getElementById("graph");
+          g.innerHTML = "";
+          g.appendChild(svgEl);
+        } catch (e) {
+          document.getElementById("errorMessage").innerText = "可視化エラー: " + (e.message || e.toString());
+        }
+      }, 0);
+    }
+  </script>
+</body>
+</html>
